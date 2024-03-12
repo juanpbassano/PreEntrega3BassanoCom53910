@@ -25,3 +25,5 @@ function registrarUsuario() {
     });
 }
 registrarUsuario();
+
+///proceso de compra y finalizar para pagar

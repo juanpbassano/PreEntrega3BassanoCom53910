@@ -41,6 +41,8 @@ function login(inusuario, inPass) {
     if (usuario === inusuario && contraseña === inPass) {//verificacion de usuario y pass
         log = true;
         alert("LOGIN CORRECTO. AHORA TIENES ACCESO AL Script");
+    //aqui guardar usuario y contraseña en local si esta el chek
+    
     } else {
         intentos -= 1;
         alert("Usuario o Contraseña incorrecta!\nIngrese nuevamente. Le quedan: " + intentos + " intentos.");
@@ -50,8 +52,6 @@ function login(inusuario, inPass) {
         return;
     }
 }
-
-
 
 //-----------------------------------------------------------------------------------
 //crear productos
@@ -99,12 +99,17 @@ function IngresoDeProductos(nombreP, precio, stock) {
         while (continuar.toLowerCase() != "s" && continuar.toLowerCase() != "n") {
             continuar = prompt('Ingrese solo la letra S o letra N ').toLowerCase();
         }
-        if (continuar == "s") {
+        (continuar === "s") ? ( //Operador ternario
+            producto.stock += parseInt(stock),
+            modificarStockYHtml(producto, producto.stock, nombreP)
+        ) : null; //DUDA CON EL NULL
+/*         if (continuar == "s") {
             producto.stock += parseInt(stock);
             modificarStockYHtml(producto, producto.stock, nombreP)
-        }
+        }  */
     }
 }
+
 //retorna si hay algun nombre de producto igual al nombre del prompt
 function existeProducto(nombre) {
     return todosLosProductos.some(producto => producto.nombre.toLowerCase() === nombre.toLowerCase());
@@ -179,6 +184,7 @@ function buscarProductos(arr, filtro) {
     });
     return encontrado;
 }
+//elementos del DOM para realizar el filtrado y luego imprimir el html de cada elemento encontrado
 const input = document.getElementById('ingreso');
 const btnBuscar = document.getElementById('buscar');
 const contenedor = document.getElementById('filtrar');
@@ -258,12 +264,9 @@ cargarCarritoDesdeLocal()
 
 //funcion para validar si hay stock sufiente antes de realizar la compra
 function validarStock(producto) {
-    if (producto.stock <= 0) {
-        alert(`Lo lamento, no tenemos mas unidades de ${producto.nombre} `);
-        return false;
-    } else {
-        return true;
-    }
+    return (producto.stock <= 0) ? ( //utilizacion de operador ternario
+        (alert(`Lo lamento, no tenemos más unidades de ${producto.nombre}`)), false
+    ) : true;
 }
 
 
@@ -342,5 +345,6 @@ function limpiarCarrito(carrito) {
 }
 
 limpiarCarrito(carrito);
-///proceso de compra y finalizar para pagar
+
+
 
