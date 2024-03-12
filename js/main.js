@@ -34,15 +34,25 @@ function login(inusuario, inPass) {
         return;
     }
     nombre = datosUsuario.nombre,
-            apellido = datosUsuario.apellido,
-            email = datosUsuario.email,
-            usuario = datosUsuario.user,
-            contraseña = datosUsuario.contraseña;
+        apellido = datosUsuario.apellido,
+        email = datosUsuario.email,
+        usuario = datosUsuario.user,
+        contraseña = datosUsuario.contraseña;
     if (usuario === inusuario && contraseña === inPass) {//verificacion de usuario y pass
         log = true;
         alert("LOGIN CORRECTO. AHORA TIENES ACCESO AL Script");
-    //aqui guardar usuario y contraseña en local si esta el chek
-    
+        //aqui guarda usuario y contraseña en local si esta el chek
+        const recordar = document.getElementById('check').checked;
+        if (recordar) {
+            sessionStorage.setItem('user', usuario);
+            sessionStorage.setItem('pass', contraseña);
+            sessionStorage.setItem('log', log);
+            sessionStorage.setItem('recordar', true);
+        } else {
+            sessionStorage.removeItem('usuario');
+            sessionStorage.removeItem('contraseña');
+            sessionStorage.removeItem('recordar');
+        }
     } else {
         intentos -= 1;
         alert("Usuario o Contraseña incorrecta!\nIngrese nuevamente. Le quedan: " + intentos + " intentos.");
@@ -57,12 +67,18 @@ function login(inusuario, inPass) {
 //crear productos
 //-----------------------------------------------------------------------------------
 
+//Traigo del seccion si el log fue correcto, por si el usuario desea seguir 
+//comprando tenga guardado el acceso correcto
+datosUsuarioJSON = sessionStorage.getItem('nuevoRegistro'),
+        datosUsuario = JSON.parse(datosUsuarioJSON);
+const logJSON= sessionStorage.getItem('log');
+log=JSON.parse(logJSON);
 //Condicional para poder ejecutar los botones
 if (!log) {
     alert("Debe Logearse correctamente para poder ejecutar los botones del HTML");
 }
 
-//Constructor de producto
+//Constructor de nuevo producto
 class Producto {
     constructor(nombre, precio, stock) {
         this.nombre = nombre;
@@ -79,7 +95,7 @@ const producto5 = new Producto("cafe", 8500, 20);
 const producto6 = new Producto("cerveza", 2200, 12);
 todosLosProductos.push(producto1, producto2, producto3, producto4, producto5, producto6);
 
-// boton para que el usuario ingrese un nuevo producto
+// seccion para que el usuario cargue  un nuevo producto
 
 const btnNuevoPro = document.getElementById('btn-ingNuevo');
 btnNuevoPro.addEventListener('click', () => {
@@ -90,23 +106,25 @@ btnNuevoPro.addEventListener('click', () => {
 });
 //funcion que crea el producto nuevo
 function IngresoDeProductos(nombreP, precio, stock) {
-    if (!existeProducto(nombreP)) {
-        agregarProducto(nombreP, precio, stock);
-    } else {
-        const producto = obtenerProducto(nombreP);
-        continuar = prompt(nombreP + ' ya existe en la lista de productos y hay ' + producto.stock +
-            ' en Stock.\nDesea agregar ' + stock + ' stock?\n[ s | n ]');
-        while (continuar.toLowerCase() != "s" && continuar.toLowerCase() != "n") {
-            continuar = prompt('Ingrese solo la letra S o letra N ').toLowerCase();
+    if (log) {
+        if (!existeProducto(nombreP)) {
+            agregarProducto(nombreP, precio, stock);
+        } else {
+            const producto = obtenerProducto(nombreP);
+            continuar = prompt(nombreP + ' ya existe en la lista de productos y hay ' + producto.stock +
+                ' en Stock.\nDesea agregar ' + stock + ' stock?\n[ s | n ]');
+            while (continuar.toLowerCase() != "s" && continuar.toLowerCase() != "n") {
+                continuar = prompt('Ingrese solo la letra S o letra N ').toLowerCase();
+            }
+            (continuar === "s") ? ( //Operador ternario
+                producto.stock += parseInt(stock),
+                modificarStockYHtml(producto, producto.stock, nombreP)
+            ) : null; //DUDA CON EL NULL
+            /*         if (continuar == "s") {
+                        producto.stock += parseInt(stock);
+                        modificarStockYHtml(producto, producto.stock, nombreP)
+                    }  */
         }
-        (continuar === "s") ? ( //Operador ternario
-            producto.stock += parseInt(stock),
-            modificarStockYHtml(producto, producto.stock, nombreP)
-        ) : null; //DUDA CON EL NULL
-/*         if (continuar == "s") {
-            producto.stock += parseInt(stock);
-            modificarStockYHtml(producto, producto.stock, nombreP)
-        }  */
     }
 }
 
@@ -179,10 +197,14 @@ function crearProductosAlHTML() {
 }
 //filtrar producto
 function buscarProductos(arr, filtro) {
-    const encontrado = arr.find((el) => {
-        return el.nombre.includes(filtro);
-    });
-    return encontrado;
+    if (log) {
+        const encontrado = arr.find((el) => {
+            return el.nombre.includes(filtro);
+        });
+        return encontrado;
+    } else {
+        alert('Debe Logearse primero.')
+    }
 }
 //elementos del DOM para realizar el filtrado y luego imprimir el html de cada elemento encontrado
 const input = document.getElementById('ingreso');
@@ -212,7 +234,11 @@ function escucharAgregar(Producto) {
     btnComprar.addEventListener('click', (e) => {
         e.preventDefault()
         cantidad = slcStock.value;
-        agregarAlCarrito(Producto, cantidad, Producto.precio);
+        if (log) {
+            agregarAlCarrito(Producto, cantidad, Producto.precio);
+        } else {
+            alert('Debe Logearse primero.')
+        }
     });
 }
 
@@ -296,6 +322,7 @@ function totalAPagar(carrito) {
     return aPagar
 }
 // llama a la funcion que crea los productos que estan en el array todosLosProductos.
+
 crearProductosAlHTML();
 
 function crearCarritoHtml(Producto) {
@@ -345,6 +372,4 @@ function limpiarCarrito(carrito) {
 }
 
 limpiarCarrito(carrito);
-
-
 

@@ -8,8 +8,6 @@ function registrarUsuario() {
             email = document.getElementById('emailR'),
             contraseña = document.getElementById('passR1'),
             repetirContraseña = document.getElementById('passR2');
-        console.log(contraseña.value);
-        console.log(repetirContraseña.value);
         if (nombre.value == '' || apellido.value == '' || email.value == '' || contraseña.value == '' || repetirContraseña.value == '') {
             alert('Por favor, completa todos los campos del formulario.');
             return;
@@ -21,7 +19,7 @@ function registrarUsuario() {
         datosUsuario = { user: (user.value), nombre: (nombre.value), apellido: (apellido.value), email: (email.value), contraseña: (contraseña.value) };
         sessionStorage.setItem('nuevoRegistro', JSON.stringify(datosUsuario));
         alert('¡Registro exitoso!');
-        window.location.href='./pages/principal.html';
+        window.location.href = './pages/principal.html';
     });
 }
 registrarUsuario();
